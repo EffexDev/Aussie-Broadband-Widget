@@ -2,7 +2,7 @@
 
 ## Description
 
-This widget is intended to store templates and tools used for day to day operations at Buddy Telco. The goal of this is to encourage consistency in communications between the customer experience team and the customers they interact with. There are also quality of life features and testing tools included to make troubleshooting more seamless.
+This widget is intended to store templates and tools used for day to day operations at Aussie Broadband. The goal of this is to encourage consistency in communications between the customer experience team and the customers they interact with. There are also quality of life features and testing tools included to make troubleshooting more seamless.
 
 ## Installation and Usage Guide
 
@@ -16,7 +16,7 @@ This widget is intended to store templates and tools used for day to day operati
 5. Run the "Buddy Toolkit.ahk" file
 
 ### How to Use - Templates
-The widget is to generate templates to perform day to day functions at Buddy Telco.
+The widget is to generate templates to perform day to day functions at Aussie Broadband.
 
 The main function, template generation is very simple to use:
 
