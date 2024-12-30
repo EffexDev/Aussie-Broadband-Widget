@@ -305,36 +305,6 @@ csTitle:=StrTitle(csFirstName[0])
     Dice:= Random(1,4)   
 }
 
-; Useful links button functions
-RunCMS(*) {
-    Run "https://cms.aussiebroadband.com.au/"
-}
-
-RunOrderSupport(*) {
-    Run "https://cms.aussiebroadband.com.au/nbnapp.php?bc=buddytelco"
-}
-
-RunNBNSQ(*) {
-    Run "https://cms.aussiebroadband.com.au/nbnsq2.php"
-}
-
-RunComplaints(*) {
-    Run "https://cms.aussiebroadband.com.au/complaints.php"
-}
-
-RunBuddy(*) {
-    Run "https://www.buddytelco.com.au/"
-}
-
-RunOutages(*) {
-    Run "https://www.nbnco.com.au/support/network-status"
-    Run "https://www.buddytelco.com.au/network/"
-}
-
-RunGPT(*) {
-    Run "https://chatgpt.com/"
-}
-
 ; Mostly for debugging/consistent. SHows you the hex code of the color under your mouse
 ^!z:: 
 {
