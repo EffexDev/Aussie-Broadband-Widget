@@ -72,10 +72,6 @@ Global CustomerNameField := AussieGui.Add("Edit", "yp-3 xm+105 w150 vCustomerNam
 TemplateTab := AussieGui.Add("Tab3","xm h70 w610 BackgroundWhite", ["General", "Accounts", "Faults","Order Support","Complaints","T and Cs"])
 ToolsTab := AussieGui.Add("Tab3", "WP h80 BackgroundWhite c222222 vToolsTab", ["QOL", "Automations", "Options"])
 
-iconsize := 32
-hIcon := LoadPicture("ABBIcon.ico", "Icon1 w" iconsize " h" iconsize, &imgtype)
-SendMessage(0x0080, 0, hIcon, AussieGui)
-SendMessage(0x0080, 1, hIcon, AussieGui) 
 AussieGui.Show("x1920 y0 w630")
 
 ;DO NOT REMOVE

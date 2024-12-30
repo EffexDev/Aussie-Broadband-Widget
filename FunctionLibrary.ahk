@@ -344,7 +344,7 @@ RunGPT(*) {
 
 ; Everything below this is the update functions
 
-VersionNumber := "1.2"
+VersionNumber := "1"
 
 Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
 global VersionNumberCheck := IniRead("version.ini", "Version", "VersionNumber")
