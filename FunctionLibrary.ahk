@@ -72,46 +72,86 @@ NSLookup(*)
         return
 }
 
-; This is a function to open a GUI containing two calendars, 2 edit fields and a submit button. It's for calculating prorata credits
+; This code is AI because I really cbf doing date math on AHK. Sam is working on refactoring this
 ProRataCalc(*) {
-    ProrataGui := Gui(,"Aussie Tool Kit")
-    ProrataGui.BackColor := "c007ba8"
+    ProrataGui := Gui(,"Buddy Tool Kit")
+    ProrataGui.BackColor := "c005900"
     ProrataGui.SetFont("s10")
     ProrataGui.Add("Text", "cFFFFFF", "Start of billing cycle")
     ProrataGui.Add("MonthCal", "yp+20 vBillingStart")
     ProrataGui.Add("Text", "yp-20 xp+240 cFFFFFF", "Service Closure Date")
     ProrataGui.Add("MonthCal", "yp+20 vServiceEnd")
-    ProrataGui.Show("w490 h300")
-    ProrataGui.Add("Edit","xm w100 vMonthlyCost", "")
+    ProrataGui.Show("w490 h330")
+    ProrataGui.Add("Edit", "xm w150 BackgroundFFFFFF vMonthlyCost")
     ProrataGui.Add("Text","yp cFFFFFF", "Enter the monthly billing amount")
-    ProrataGui.Add("Edit","xm w100 vdaysInMonth", "")
-    ProrataGui.Add("Text","yp cFFFFFF", "How many days this month?")
+    ProrataGui.Add("Edit", "xm w150 vDiscountAmount","0")
+    ProrataGui.Add("Text","yp cFFFFFF", "Enter any current discounts")
+    ProrataGui.Add("Edit", "xm w150 vPlanChanges","0")
+    ProrataGui.Add("Text","yp cFFFFFF", "Enter any plan change costs")
     ProrataGui.Add("Button","xm", "Calculate").OnEvent("Click", PRCalcBox)
 
-        ; Generates a third GUI with the correct prorata amount
-        PRCalcBox(*) {
-            Saved:= ProrataGui.Submit(False)
-            DaysPassed := DateDiff(Saved.ServiceEnd, Saved.BillingStart, "days")
-            Month := 
-            DailyCost := Saved.MonthlyCost / Saved.daysInMonth
-            DaysUsed := DailyCost * DaysPassed
-            ProrataAmount := Saved.MonthlyCost - DaysUsed
-            MsgBox "The prorata amount is " ProrataAmount
+    GetDaysInMonth(date) {
+        year := FormatTime(date, "yyyy")
+        month := FormatTime(date, "MM")
+        
+        if (month = "12") {
+            nextMonthYear := year + 1
+            nextMonthMonth := "01"
+        } else {
+            nextMonthYear := year
+            nextMonthMonth := Format("{:02}", month + 1)
         }
+        
+        currentMonthDate := year . month . "01"
+        nextMonthDate := nextMonthYear . nextMonthMonth . "01"
+        
+        return DateDiff(nextMonthDate, currentMonthDate, "days")
+    }
+
+    PRCalcBox(*) {
+    try {
+        Saved := ProrataGui.Submit(False)
+        MonthlyCost := Saved.MonthlyCost
+        MonthlyCost := MonthlyCost - Saved.DiscountAmount
+        MonthlyCost := MonthlyCost + Saved.PlanChanges
+        DaysPassed := DateDiff(Saved.ServiceEnd, Saved.BillingStart, "days")
+        daysInMonth := GetDaysInMonth(Saved.BillingStart)
+        DailyCost := MonthlyCost / daysInMonth
+        DaysUsed := DailyCost * DaysPassed
+        ProrataAmount := MonthlyCost - DaysUsed
+        MsgBox "The prorata amount is " ProrataAmount
+    }
+    catch as Error {
+        MsgBox "Fields cannot be blank"
+    }
+}
 }
 
 ; Generates a GUI with a large blank input field for typing notes into. There is no check to see if it is already open as having more than one open could be intended. THIS IS NOT PERSISTENMT AND CANNOT SAVE FILES
 Notepad(DarkmodeButton, *) {
     Global NotesGui, Notes    
 
-    if !NotesGui {  ; Only create a new GUI if it doesn't exist    
-        NotesGui := Gui(,"Notepad")
-        NotesGui.SetFont("s10","Nunito")
-        NotesGui.BackColor := "c007ba8"
-        Notes := NotesGui.Add("Edit", "h600 w685", "")
+    NotesGui := Gui("+Resize", "Notepad")
+    NotesGui.SetFont("s10", "Nunito")
+    NotesGui.BackColor := "c005900"
+    
+    ; Create the edit control
+    Notes := NotesGui.Add("Edit", "w700 h600", "")
+    
+    ; Set up the OnResize event
+    NotesGui.OnEvent("Size", ResizeGui)
+
+    ResizeGui(*) {
+        ; Get the current width and height of the GUI
+        NotesGui.GetPos(&x,&y,&GuiWidth,&GuiHeight)
         
-        NotesGui.OnEvent("Close", (*) => (NotesGui := "", Notes := ""))
+        ; ; Resize the edit control to fit the GUI
+        Notes.Move(10,10,GuiWidth-35,GuiHeight-60)  
+
     }
+    
+    NotesGui.OnEvent("Close", (*) => (NotesGui := "", Notes := ""))
+    
     NotesGui.Show("w710 h620")
 }
 
@@ -122,7 +162,7 @@ TemplatesPad(*) {
     if !TemplatesGui {  ; Only create a new GUI if it doesn't exist
         TemplatesGui := Gui(,"Templates")
         TemplatesGui.SetFont("s10","Nunito")
-        TemplatesGui.BackColor := "c007ba8"
+        TemplatesGui.BackColor := "c005900"
         Templates := TemplatesGui.Add("Edit", "h600 w685", "")
         
         ; Add handler for GUI close to reset the variables
@@ -137,7 +177,7 @@ HotkeysPad(*) {
     if !HotkeysGui {
         HotkeysGui := Gui(,"Available Hotkeys")
         HotkeysGui.SetFont("s10","Nunito")
-        HotkeysGui.BackColor := "c007ba8"
+        HotkeysGui.BackColor := "c005900"
         Hotkeys := HotkeysGui.Add("Text", "+Wrap cFFFFFF", "Available Hotkeys:`n`n@@ - Your email`n`n~~ - Date 7 calendar days from now. For abandoment comms`n`nCTRL+S - Randomized signature for app faults. Also checks the publish to app checkbox`n`nCTRL+DEL - Content aware search ie. Superlookup")
         
         HotkeysGui.OnEvent("Close", (*) => (HotkeyssGui := "", Hotkeys := ""))
@@ -218,15 +258,10 @@ Startup(*)
         }
 }
 
-WhatTheDogDoin(*) {
-    ToolTip("I don't talk")
-    SetTimer () => ToolTip(), -2000
-}
-
+; Grab the customer name out of the form
 SaveCustomerName(ctrl, *)
 {
     Global ShowNotesButton
-    ; Takes the options submitted from the dropdowns and saves them to an array called "Saved"
     Saved:= AussieGui.Submit(False)
 
     Global Customer := Saved.CustomerName
@@ -270,12 +305,13 @@ csTitle:=StrTitle(csFirstName[0])
     Dice:= Random(1,4)   
 }
 
+; Useful links button functions
 RunCMS(*) {
     Run "https://cms.aussiebroadband.com.au/"
 }
 
 RunOrderSupport(*) {
-    Run "https://cms.aussiebroadband.com.au/nbnapp.php?bc=Aussietelco"
+    Run "https://cms.aussiebroadband.com.au/nbnapp.php?bc=buddytelco"
 }
 
 RunNBNSQ(*) {
@@ -286,33 +322,36 @@ RunComplaints(*) {
     Run "https://cms.aussiebroadband.com.au/complaints.php"
 }
 
-RunAussie(*) {
-    Run "https://www.Aussietelco.com.au/"
+RunBuddy(*) {
+    Run "https://www.buddytelco.com.au/"
 }
 
 RunOutages(*) {
     Run "https://www.nbnco.com.au/support/network-status"
-    Run "https://www.Aussietelco.com.au/network/"
+    Run "https://www.buddytelco.com.au/network/"
 }
 
 RunGPT(*) {
     Run "https://chatgpt.com/"
 }
 
-^!z::  ; Control+Alt+Z hotkey.
+; Mostly for debugging/consistent. SHows you the hex code of the color under your mouse
+^!z:: 
 {
     MouseGetPos &MouseX, &MouseY
     MsgBox "The color at the current cursor position is " PixelGetColor(MouseX, MouseY)
 }
 
-VersionNumber := "4.2"
+; Everything below this is the update functions
 
-Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
+VersionNumber := "1"
+
+Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
 global VersionNumberCheck := IniRead("version.ini", "Version", "VersionNumber")
 
 if VersionNumberCheck > VersionNumber {
-    AutoUpdateGui := Gui("-Caption +AlwaysOnTop","Aussie Tool Kit")
-    AutoUpdateGui.BackColor := "c007ba8"
+    AutoUpdateGui := Gui("-Caption +AlwaysOnTop","Buddy Tool Kit")
+    AutoUpdateGui.BackColor := "c005900"
     AutoUpdateGui.SetFont("s10")
     AutoUpdateGui.Show("w150 h70")
     AutoUpdateGui.Add("Text","x+13 y+5 cFFFFFF", "Update Available")
@@ -325,12 +364,13 @@ if VersionNumberCheck > VersionNumber {
 }
 
 UpdateWidgetCheck(*) {
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
+    ControlSetEnabled 0, UpdateButton
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
     global VersionNumberCheck := IniRead("version.ini", "Version", "VersionNumber")
     
     if VersionNumberCheck > VersionNumber {
-        Global CheckUpdateGui := Gui("-Caption +AlwaysOnTop","Aussie Tool Kit")
-        CheckUpdateGui.BackColor := "c007ba8"
+        Global CheckUpdateGui := Gui("-Caption +AlwaysOnTop","Buddy Tool Kit")
+        CheckUpdateGui.BackColor := "c005900"
         CheckUpdateGui.SetFont("s10")
         CheckUpdateGui.Show("w150 h70")
         CheckUpdateGui.Add("Text","x+13 y+5 cFFFFFF", "Update Available")
@@ -339,13 +379,13 @@ UpdateWidgetCheck(*) {
 
         UpdateWidgetCheck(*) {
             CheckUpdateGui.Destroy
+            ControlSetEnabled 1, UpdateButton
             UpdateWidget()
         }
-
     }
     else {
-        CheckUpdateGui := Gui("-Caption +AlwaysOnTop","Aussie Tool Kit")
-        CheckUpdateGui.BackColor := "c007ba8"
+        CheckUpdateGui := Gui("-Caption +AlwaysOnTop","Buddy Tool Kit")
+        CheckUpdateGui.BackColor := "c005900"
         CheckUpdateGui.SetFont("s10")
         CheckUpdateGui.Show("w150 h70")
         CheckUpdateGui.Add("Text","x+13 y+5 cFFFFFF", "You're up to date!")
@@ -354,37 +394,40 @@ UpdateWidgetCheck(*) {
 
     CloseGui(*) {
         CheckUpdateGui.Destroy
+        ControlSetEnabled 1, UpdateButton
     }
 }
 
 UpdateWidget(*) {
-    LoadingGui := Gui("-Caption","Aussie Tool Kit")
-    LoadingGui.BackColor := "c007ba8"
+    LoadingGui := Gui("-Caption","Buddy Tool Kit")
+    LoadingGui.BackColor := "c005900"
     LoadingGui.SetFont("s10")
     LoadingGui.Show("w200 h60")
     LoadingGui.Add("Text", "cFFFFFF", "Updating")
     LoadingGui.Add("Progress", " w180 h20 cGreen vMyProgress", 0)
-    LoadingGui["MyProgress"].Value := 14
+    LoadingGui["MyProgress"].Value := 12
     Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/Changelog.txt", A_WorkingDir . "\Changelog.txt")
-    LoadingGui["MyProgress"].Value := 28
+    LoadingGui["MyProgress"].Value := 24
+    Sleep "500"    
+    LoadingGui["MyProgress"].Value := 36
     Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/AussieToolKit.ahk", A_WorkingDir . "\AussieToolKit.ahk")
-    LoadingGui["MyProgress"].Value := 42
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/FunctionLibrary.ahk", A_WorkingDir . "\FunctionLibrary.ahk")
+    LoadingGui["MyProgress"].Value := 48
     Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/FunctionLibrary.ahk", A_WorkingDir . "\FunctionLibrary.ahk")
-    LoadingGui["MyProgress"].Value := 56
-    Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/Generate.ahk", A_WorkingDir . "\Generate.ahk")
-    LoadingGui["MyProgress"].Value := 70
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/Generate.ahk", A_WorkingDir . "\Generate.ahk")
+    LoadingGui["MyProgress"].Value := 60
     Sleep "1000"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/Settings.ahk", A_WorkingDir . "\Settings.ahk")
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/Settings.ahk", A_WorkingDir . "\Settings.ahk")
+    LoadingGui["MyProgress"].Value := 72
+    Sleep "500"
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/Templates.ahk", A_WorkingDir . "\Templates.ahk")
     LoadingGui["MyProgress"].Value := 84
     Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/Templates.ahk", A_WorkingDir . "\Templates.ahk")
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/config.ini", A_WorkingDir . "\config.ini")
+    LoadingGui["MyProgress"].Value := 96
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/AussieToolKit.ahk", A_WorkingDir . "\BuddyToolKit.ahk")
     LoadingGui["MyProgress"].Value := 100
-    Sleep "500"
-    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Telco-Widget/refs/heads/main/config.ini", A_WorkingDir . "\config.ini")
+    Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/Changelog.txt", A_WorkingDir . "\Changelog.txt")
     LoadingGui.Destroy
     MsgBox "Update Complete"
     Run "Changelog.txt"

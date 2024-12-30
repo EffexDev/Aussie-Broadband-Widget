@@ -56,21 +56,21 @@ Hotkeys.SetFont("s10","Nunito")
 Notes.SetFont("s10","Nunito")
 Templates.SetFont("s10","Nunito")
 
-NotesGui.BackColor := "c007ba8"
-TemplatesGui.BackColor := "c007ba8"
-HotkeysGui.BackColor := "c007ba8"
+NotesGui.BackColor := "c005900"
+TemplatesGui.BackColor := "c005900"
+HotkeysGui.BackColor := "c005900"
 
 ; The main body of the GUI itself. Dimensions and tabs etc
 Global AussieGui := Gui("-Caption +Border","Aussie Tool Kit V2.0")
-AussieGui.BackColor := "c007ba8"
-AussieGui.Add("Picture", "ym+10 x+20 w180 h-1","AussieLogo.png")
+AussieGui.BackColor := "c005900"
+AussieGui.Add("Picture", "ym+10 x+20 w215 h-1","AussieLogo.png")
 
 
 AussieGui.SetFont("s10 c000000","Nunito")
 AussieGui.Add("Text", " xm cFFFFFF" , "Customer Name:")
 Global CustomerNameField := AussieGui.Add("Edit", "yp-3 xm+105 w150 vCustomerNameValue", "").OnEvent("Change", CustomerNameEdit)
 TemplateTab := AussieGui.Add("Tab3","xm h70 w610 BackgroundWhite", ["General", "Accounts", "Faults","Order Support","Complaints","T and Cs"])
-ToolsTab := AussieGui.Add("Tab3", "WP h80 BackgroundWhite c222222 vToolsTab", ["QOL", "Automations", "Useful Links", "Options"])
+ToolsTab := AussieGui.Add("Tab3", "WP h80 BackgroundWhite c222222 vToolsTab", ["QOL", "Automations", "Options"])
 
 AussieGui.Show("x1920 y0 w630")
 
@@ -132,15 +132,6 @@ AussieGui.Add("Button", "yp", "NSLookup").OnEvent("Click", NSLookup)
 AussieGui.Add("Button", "yp", "Prorata Calc").OnEvent("Click", ProRataCalc)
 
 ToolsTab.UseTab(3)
-AussieGui.Add("Button", "xm+15 y245 Section", "CMS").OnEvent("Click", RunCMS)
-AussieGui.Add("Button", "yp", "Order Support").OnEvent("Click", RunOrderSupport)
-AussieGui.Add("Button", "yp", "NBN SQ").OnEvent("Click", RunNBNSQ)
-AussieGui.Add("Button", "yp", "Complaints").OnEvent("Click", RunComplaints)
-AussieGui.Add("Button", "yp", "Aussie Website").OnEvent("Click", RunAussie)
-AussieGui.Add("Button", "yp", "Outages").OnEvent("Click", RunOutages)
-AussieGui.Add("Button", "yp", "ChatGPT").OnEvent("Click", RunGPT)
-
-ToolsTab.UseTab(4)
 Global AlwaysOnTopButton := AussieGui.Add("Checkbox", "xm+15 y245 Section vAlwaysOnTop ").OnEvent("Click", AlwaysOnTopToggle)
 AlwaysOnTopCheckBoxText := AussieGui.Add("Text", "yp xp+20 c000000", "Always on Top")
 Global ShowNotesButton := AussieGui.Add("Checkbox", "yp x+20 vShowNotesButton").OnEvent("Click", ShowNotes)
