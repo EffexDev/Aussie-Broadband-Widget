@@ -1,3 +1,3 @@
-Version 1
+Version 1.1
 
-Release to Aussie after approval. Test version for gathering templates/ bug reports, feature requests.
+Testing update function
