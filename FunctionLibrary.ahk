@@ -314,7 +314,7 @@ csTitle:=StrTitle(csFirstName[0])
 
 ; Everything below this is the update functions
 
-VersionNumber := "1"
+VersionNumber := "1.1"
 
 Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
 global VersionNumberCheck := IniRead("version.ini", "Version", "VersionNumber")
@@ -334,7 +334,6 @@ if VersionNumberCheck > VersionNumber {
 }
 
 UpdateWidgetCheck(*) {
-    ControlSetEnabled 0, UpdateButton
     Download("https://raw.githubusercontent.com/EffexDev/Aussie-Broadband-Widget/refs/heads/main/version.ini", A_WorkingDir . "\version.ini")
     global VersionNumberCheck := IniRead("version.ini", "Version", "VersionNumber")
     
@@ -349,7 +348,6 @@ UpdateWidgetCheck(*) {
 
         UpdateWidgetCheck(*) {
             CheckUpdateGui.Destroy
-            ControlSetEnabled 1, UpdateButton
             UpdateWidget()
         }
     }
@@ -364,7 +362,6 @@ UpdateWidgetCheck(*) {
 
     CloseGui(*) {
         CheckUpdateGui.Destroy
-        ControlSetEnabled 1, UpdateButton
     }
 }
 
